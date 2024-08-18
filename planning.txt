@@ -1,0 +1,2 @@
+first create the "server.js" file then install the required packages .
+create a model folder and make a schema files , ex , user.js and candidate.js
