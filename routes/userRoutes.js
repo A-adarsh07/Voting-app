@@ -31,7 +31,7 @@ router.login('/login',async (req,res) => {
         const {aadharCardNumber,password} =req.body;
 
         // find the user by aadharcardNumber
-        const user=await personalbar.findOne({aadharCardNumber:aadharCardNumber});
+        const user=await user.findOne({aadharCardNumber:aadharCardNumber});
 
         if(!user || !(await user.comparePassword(password))){
             return res.status(401).json({error:'Invalid username or password'});
@@ -44,7 +44,28 @@ router.login('/login',async (req,res) => {
         // return token as response
         res.json({token});
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({error:'Internal server errror'});
     }
 })
+
+router.put('/profile/password',async(req,res)=> {
+    try {
+        const userId= req.user.id;
+        const {currentPassword,newPassword}=req.body;
+
+        const user=await user.findById(userId);
+        if(!(await user.comparePassword(currentPassword))){
+            return res.status(401).json({error:"Invalid username or password"});
+        }
+        user.password=newPassword;
+        await user.save();
+
+            console.log('password updated');
+            res.status(200).json({message:"Password updated"});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error:"Internal server error"});
+    }
+})
+module.exports=router;
