@@ -29,8 +29,22 @@ router.login('/login',async (req,res) => {
     try {
         // Extract aadharcardnumber and password from request body 
         const {aadharCardNumber,password} =req.body;
-        
+
+        // find the user by aadharcardNumber
+        const user=await personalbar.findOne({aadharCardNumber:aadharCardNumber});
+
+        if(!user || !(await user.comparePassword(password))){
+            return res.status(401).json({error:'Invalid username or password'});
+        }
+        // generate token
+        const payload={
+            id:user.id,
+        }
+        const token =generateToken(payload);
+        // return token as response
+        res.json({token});
     } catch (error) {
-        
+        console.error(error);
+        res.status(500).json({error:'Internal server errror'});
     }
 })
