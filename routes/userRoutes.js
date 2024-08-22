@@ -49,12 +49,25 @@ router.login('/login',async (req,res) => {
     }
 })
 
+ router.get('/profile',jwtAuthMiddleware,async(req,res) => {
+    try {
+        const userData = req.user;
+        const userId = userData.id;
+        const user=await Person.findById(userId);
+        res.status(200).json({user});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Internal Server Error"});
+    }
+ })
+
 router.put('/profile/password',async(req,res)=> {
     try {
         const userId= req.user.id;
         const {currentPassword,newPassword}=req.body;
 
         const user=await user.findById(userId);
+
         if(!(await user.comparePassword(currentPassword))){
             return res.status(401).json({error:"Invalid username or password"});
         }
@@ -68,4 +81,11 @@ router.put('/profile/password',async(req,res)=> {
         res.status(500).json({error:"Internal server error"});
     }
 })
+
+
+
+
+
+
+
 module.exports=router;
